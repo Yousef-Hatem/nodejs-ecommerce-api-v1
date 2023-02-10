@@ -32,7 +32,7 @@ exports.getProduct = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.createProduct = asyncHandler(async (req, res) => {
   req.body.slug = slugify(req.body.title);
-  const product = await Product.create(req.body.slug);
+  const product = await Product.create(req.body);
   res.status(201).json({ data: product });
 });
 
