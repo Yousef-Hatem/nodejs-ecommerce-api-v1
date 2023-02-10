@@ -4,6 +4,11 @@ const ApiError = require("../utils/apiError");
 
 const SubCategory = require("../models/subCategoryModel");
 
+exports.setCategoryIdToBody = (req, res, next) => {
+  if (!req.body.category) req.body.category = req.params.categoryId;
+  next();
+};
+
 // @desc    Create subCategory
 // @route   POST /api/v1/subCategories
 // @access  Private
@@ -17,6 +22,13 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
   res.status(201).json({ data: subCategory });
 });
 
+exports.createFilterObj = (req, res, next) => {
+  let filterObject = {};
+  if (req.params.categoryId) filterObject = { category: req.params.categoryId };
+  req.filterObject = filterObject;
+  next();
+};
+
 // @desc    Get list of subCategory
 // @route   GET /api/v1/subcategories
 // @access  Public
@@ -25,10 +37,7 @@ exports.getSubCategories = asyncHandler(async (req, res) => {
   const limit = req.query.limit * 1 || 5;
   const skip = (page - 1) * limit;
 
-  let filterObject = {};
-  if (req.params.categoryId) filterObject = { category: req.params.categoryId };
-
-  const subCategories = await SubCategory.find(filterObject)
+  const subCategories = await SubCategory.find(req.filterObject)
     .skip(skip)
     .limit(limit);
   res
