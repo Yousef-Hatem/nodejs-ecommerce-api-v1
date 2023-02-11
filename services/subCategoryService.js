@@ -1,9 +1,10 @@
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
+const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
 
 const SubCategory = require("../models/subCategoryModel");
-const ApiFeatures = require("../utils/apiFeatures");
 
 exports.setCategoryIdToBody = (req, res, next) => {
   if (!req.body.category) req.body.category = req.params.categoryId;
@@ -45,13 +46,11 @@ exports.getSubCategories = asyncHandler(async (req, res) => {
   const { mongooseQuery, paginationResult } = apiFeatures;
   const subCategories = await mongooseQuery;
 
-  res
-    .status(200)
-    .json({
-      results: subCategories.length,
-      paginationResult,
-      data: subCategories,
-    });
+  res.status(200).json({
+    results: subCategories.length,
+    paginationResult,
+    data: subCategories,
+  });
 });
 
 // @desc    Get specific subcategory by id
@@ -88,13 +87,5 @@ exports.updateSubCategory = asyncHandler(async (req, res, next) => {
 // @desc    Delete specific subCategory
 // @route   DELETE /api/v1/subCategories:id
 // @access  Private
-exports.deleteSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const subCategory = await SubCategory.findByIdAndDelete(id);
 
-  if (!subCategory) {
-    return next(new ApiError(`No subCategory for this id ${id}`, 404));
-  }
-
-  res.status(204).send();
-});
+exports.deleteSubCategory = factory.deleteOne(SubCategory);
