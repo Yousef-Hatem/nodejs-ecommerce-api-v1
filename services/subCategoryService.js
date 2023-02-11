@@ -14,15 +14,7 @@ exports.setCategoryIdToBody = (req, res, next) => {
 // @desc    Create subCategory
 // @route   POST /api/v1/subCategories
 // @access  Private
-exports.createSubCategory = asyncHandler(async (req, res) => {
-  const { name, category } = req.body;
-  const subCategory = await SubCategory.create({
-    name,
-    slug: slugify(name),
-    category,
-  });
-  res.status(201).json({ data: subCategory });
-});
+exports.createSubCategory = factory.createOne(SubCategory);
 
 exports.createFilterObj = (req, res, next) => {
   let filterObject = {};
@@ -68,21 +60,7 @@ exports.getSubCategory = asyncHandler(async (req, res, next) => {
 // @desc    Update specific subCategory
 // @route   PUT /api/v1/subCategories/:id
 // @access  Private
-exports.updateSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name, category } = req.body;
-
-  const subCategory = await SubCategory.findOneAndUpdate(
-    { _id: id },
-    { name, slug: slugify(name), category },
-    { new: true }
-  );
-
-  if (!subCategory) {
-    return next(new ApiError(`No subCategory for this id ${id}`, 404));
-  }
-  res.status(200).json({ data: subCategory });
-});
+exports.updateSubCategory = factory.updateOne(SubCategory);
 
 // @desc    Delete specific subCategory
 // @route   DELETE /api/v1/subCategories:id
