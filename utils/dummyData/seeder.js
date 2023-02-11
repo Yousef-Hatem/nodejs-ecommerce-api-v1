@@ -1,5 +1,6 @@
 const fs = require("fs");
-// require('colors');
+// eslint-disable-next-line import/no-extraneous-dependencies, node/no-unpublished-require
+require("colors");
 const dotenv = require("dotenv");
 const Product = require("../../models/productModel");
 const dbConnection = require("../../config/database");
@@ -17,7 +18,7 @@ const insertData = async () => {
   try {
     await Product.create(products);
 
-    console.log("Data Inserted".green.inverse);
+    console.log("Data Inserted".green);
     process.exit();
   } catch (error) {
     console.log(error);
@@ -28,7 +29,7 @@ const insertData = async () => {
 const destroyData = async () => {
   try {
     await Product.deleteMany();
-    console.log("Data Destroyed".red.inverse);
+    console.log("Data Destroyed".red);
     process.exit();
   } catch (error) {
     console.log(error);
