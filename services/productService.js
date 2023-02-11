@@ -1,5 +1,3 @@
-const asyncHandler = require("express-async-handler");
-const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
 
 const Product = require("../models/productModel");
@@ -7,22 +5,7 @@ const Product = require("../models/productModel");
 // @desc    Get list of product
 // @route   GET /api/v1/products
 // @access  Public
-exports.getProducts = asyncHandler(async (req, res) => {
-  const documentsCount = await Product.countDocuments();
-  const apiFeatures = new ApiFeatures(Product.find(), req.query)
-    .paginate(documentsCount)
-    .filter()
-    .search("Products")
-    .limitFields()
-    .sort();
-
-  const { mongooseQuery, paginationResult } = apiFeatures;
-  const products = await mongooseQuery;
-
-  res
-    .status(200)
-    .json({ results: products.length, paginationResult, data: products });
-});
+exports.getProducts = factory.getAll(Product, "Products");
 
 // @desc    Get specific product by id
 // @route   GET /api/v1/products/:id
@@ -42,5 +25,4 @@ exports.updateProduct = factory.updateOne(Product);
 // @desc    Delete specific product
 // @route   DELETE /api/v1/products:id
 // @access  Private
-
 exports.deleteProduct = factory.deleteOne(Product);
