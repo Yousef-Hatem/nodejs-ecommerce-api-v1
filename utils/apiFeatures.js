@@ -37,13 +37,17 @@ class ApiFeatures {
     return this;
   }
 
-  search() {
+  search(moduleName) {
     if (this.queryString.keyword) {
-      const query = {};
-      query.$or = [
-        { title: { $regex: this.queryString.keyword, $options: "i" } },
-        { description: { $regex: this.queryString.keyword, $options: "i" } },
-      ];
+      let query = {};
+      if (moduleName === "Products") {
+        query.$or = [
+          { title: { $regex: this.queryString.keyword, $options: "i" } },
+          { description: { $regex: this.queryString.keyword, $options: "i" } },
+        ];
+      } else {
+        query = { name: { $regex: this.queryString.keyword, $options: "i" } };
+      }
       this.mongooseQuery = this.mongooseQuery.find(query);
     }
     return this;
