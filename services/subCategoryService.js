@@ -1,6 +1,4 @@
-const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
-const ApiError = require("../utils/apiError");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
 
@@ -48,14 +46,7 @@ exports.getSubCategories = asyncHandler(async (req, res) => {
 // @desc    Get specific subcategory by id
 // @route   GET /api/v1/subcategories/:id
 // @access  Public
-exports.getSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const subCategory = await SubCategory.findById(id);
-  if (!subCategory) {
-    return next(new ApiError(`No subCategory for this id ${id}`, 404));
-  }
-  res.status(200).json({ data: subCategory });
-});
+exports.getSubCategory = factory.getOne(SubCategory);
 
 // @desc    Update specific subCategory
 // @route   PUT /api/v1/subCategories/:id
