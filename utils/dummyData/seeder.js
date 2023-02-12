@@ -1,5 +1,5 @@
 const fs = require("fs");
-// eslint-disable-next-line import/no-extraneous-dependencies, node/no-unpublished-require
+// eslint-disable-next-line node/no-unpublished-require
 require("colors");
 const dotenv = require("dotenv");
 const Product = require("../../models/productModel");
