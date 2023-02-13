@@ -34,7 +34,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: user, token });
 });
 
-const getToken = (req, next) => {
+const checkIfTokenExist = (req, next) => {
   let token;
   if (
     req.headers.authorization &&
@@ -50,9 +50,10 @@ const getToken = (req, next) => {
       )
     );
   }
+  return token;
 };
 
-const getUser = async (userId, next) => {
+const checkIfUserExists = async (userId, next) => {
   const user = await User.findById(userId);
   if (!user) {
     return next(
@@ -62,6 +63,7 @@ const getUser = async (userId, next) => {
       )
     );
   }
+  return user;
 };
 
 const checkIfUserChangeHisPassword = (user, decoded, next) => {
@@ -83,11 +85,11 @@ const checkIfUserChangeHisPassword = (user, decoded, next) => {
 };
 
 exports.protect = asyncHandler(async (req, res, next) => {
-  const token = getToken(req, next);
+  const token = checkIfTokenExist(req, next);
 
-  const decoded = jwt.verify({ token }, process.env.JWT_SECRET_KEY);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-  const currentUser = getUser(decoded.userId, next);
+  const currentUser = checkIfUserExists(decoded.userId, next);
 
   checkIfUserChangeHisPassword(currentUser, decoded, next);
 
