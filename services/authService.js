@@ -34,7 +34,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: user, token });
 });
 
-exports.protect = asyncHandler(async (req, res, next) => {
+const getToken = (req, next) => {
   let token;
   if (
     req.headers.authorization &&
@@ -50,11 +50,11 @@ exports.protect = asyncHandler(async (req, res, next) => {
       )
     );
   }
+};
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-  const currentUser = await User.findById(decoded.userId);
-  if (!currentUser) {
+const getUser = async (userId, next) => {
+  const user = await User.findById(userId);
+  if (!user) {
     return next(
       new ApiError(
         "The user that belong to this token does no longer exist",
@@ -62,10 +62,12 @@ exports.protect = asyncHandler(async (req, res, next) => {
       )
     );
   }
+};
 
-  if (currentUser.passwordChangedAt) {
+const checkIfUserChangeHisPassword = (user, decoded, next) => {
+  if (user.passwordChangedAt) {
     const passChangedTimestamp = parseInt(
-      currentUser.passwordChangedAt.getTime() / 1000,
+      user.passwordChangedAt.getTime() / 1000,
       10
     );
 
@@ -78,7 +80,18 @@ exports.protect = asyncHandler(async (req, res, next) => {
       );
     }
   }
+};
+
+exports.protect = asyncHandler(async (req, res, next) => {
+  const token = getToken(req, next);
+
+  const decoded = jwt.verify({ token }, process.env.JWT_SECRET_KEY);
+
+  const currentUser = getUser(decoded.userId, next);
+
+  checkIfUserChangeHisPassword(currentUser, decoded, next);
 
   req.user = currentUser;
+
   next();
 });
