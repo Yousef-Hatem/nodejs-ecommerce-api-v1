@@ -62,4 +62,23 @@ exports.protect = asyncHandler(async (req, res, next) => {
       )
     );
   }
+
+  if (currentUser.passwordChangedAt) {
+    const passChangedTimestamp = parseInt(
+      currentUser.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    if (passChangedTimestamp > decoded.iat) {
+      return next(
+        new ApiError(
+          "User recently changed his password, please login again..",
+          401
+        )
+      );
+    }
+  }
+
+  req.user = currentUser;
+  next();
 });
