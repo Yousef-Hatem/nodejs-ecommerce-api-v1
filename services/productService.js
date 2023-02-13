@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const sharp = require("sharp");
 const factory = require("./handlersFactory");
 const Product = require("../models/productModel");
-const { uploadMixOfImages } = require("../middlewares/uploadimageMiddleware");
+const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
 exports.uploadProductImages = uploadMixOfImages([
   {
