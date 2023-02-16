@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -109,10 +110,22 @@ exports.allowedTo = (...roles) =>
   });
 
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({ email: req.email });
+  const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(
-      new ApiError(`There is no user with that email ${req.email}`, 404)
+      new ApiError(`There is no user with that email ${req.body.email}`, 404)
     );
   }
+
+  const restCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedRestCode = crypto
+    .createHash("sha256")
+    .update(restCode)
+    .digest("hex");
+
+  user.passwordResetCode = hashedRestCode;
+  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  user.passwordResetVerified = false;
+
+  await user.save();
 });
