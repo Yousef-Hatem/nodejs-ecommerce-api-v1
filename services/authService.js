@@ -89,7 +89,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-  const currentUser = checkIfUserExists(decoded.userId, next);
+  const currentUser = await checkIfUserExists(decoded.userId, next);
 
   checkIfUserChangeHisPassword(currentUser, decoded, next);
 
@@ -97,3 +97,13 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+exports.allowedTo = (...roles) =>
+  asyncHandler(async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ApiError("You are not allowed to access this route", 403)
+      );
+    }
+    next();
+  });

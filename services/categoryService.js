@@ -9,15 +9,17 @@ const Category = require("../models/categoryModel");
 exports.uploadCategoryImage = uploadSingleImage("image");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
+  if (req.file) {
+    const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 95 })
-    .toFile(`uploads/categories/${filename}`);
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/categories/${filename}`);
 
-  req.body.image = filename;
+    req.body.image = filename;
+  }
 
   next();
 });
@@ -45,5 +47,4 @@ exports.updateCategory = factory.updateOne(Category);
 // @desc    Delete specific category
 // @route   DELETE /api/v1/categories:id
 // @access  Private
-
 exports.deleteCategory = factory.deleteOne(Category);
