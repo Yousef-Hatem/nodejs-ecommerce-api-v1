@@ -80,7 +80,7 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
   next();
 });
 
-exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+exports.updateLoggedUserPassword = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -97,7 +97,7 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: user, token });
 });
 
-exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
+exports.updateLoggedUserData = asyncHandler(async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -109,4 +109,10 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
   );
 
   res.status(200).json({ data: updatedUser });
+});
+
+exports.deleteLoggedUserData = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(req.user._id, { active: false });
+
+  res.status(204).json({ status: "Success" });
 });
