@@ -96,3 +96,17 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ data: user, token });
 });
+
+exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    },
+    { new: true }
+  );
+
+  res.status(200).json({ data: updatedUser });
+});
