@@ -66,7 +66,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: document });
 });
 
-exports.changUserPassword = asyncHandler(async (req, res, next) => {
+exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   const document = await User.findByIdAndUpdate(
     req.params.id,
     {
@@ -88,3 +88,8 @@ exports.changUserPassword = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/users:id
 // @access  Private
 exports.deleteUser = factory.deleteOne(User);
+
+exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+});
