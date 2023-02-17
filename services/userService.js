@@ -4,9 +4,10 @@ const sharp = require("sharp");
 const bcrypt = require("bcryptjs");
 
 const factory = require("./handlersFactory");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
-const User = require("../models/userModel");
 const ApiError = require("../utils/apiError");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const createToken = require("../utils/createToken");
+const User = require("../models/userModel");
 
 exports.uploadUserImage = uploadSingleImage("profileImg");
 
@@ -26,24 +27,12 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
   next();
 });
 
-// @desc    Get list of user
-// @route   GET /api/v1/users
-// @access  Private
 exports.getUsers = factory.getAll(User);
 
-// @desc    Get specific user by id
-// @route   GET /api/v1/users/:id
-// @access  Private
 exports.getUser = factory.getOne(User);
 
-// @desc    Create user
-// @route   POST /api/v1/users
-// @access  Private
 exports.createUser = factory.createOne(User);
 
-// @desc    Update specific user
-// @route   PUT /api/v1/users/:id
-// @access  Private
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const document = await User.findByIdAndUpdate(
     req.params.id,
@@ -84,12 +73,26 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: document });
 });
 
-// @desc    Delete specific user
-// @route   DELETE /api/v1/users:id
-// @access  Private
 exports.deleteUser = factory.deleteOne(User);
 
 exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
   req.params.id = req.user._id;
   next();
+});
+
+exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+      passwordChangedAt: Date.now(),
+    },
+    {
+      new: true,
+    }
+  );
+
+  const token = createToken(user._id);
+
+  res.status(200).json({ data: user, token });
 });

@@ -6,13 +6,9 @@ const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const sendEmail = require("../utils/sendEmail");
+const createToken = require("../utils/createToken");
 
 const User = require("../models/userModel");
-
-const createToken = (payload) =>
-  jwt.sign({ userId: payload }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE_TIME,
-  });
 
 exports.signup = asyncHandler(async (req, res) => {
   const user = await User.create({
@@ -38,7 +34,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: user, token });
 });
 
-const checkIfTokenExist = (req, next) => {
+const getToken = (req) => {
   let token;
   if (
     req.headers.authorization &&
@@ -46,6 +42,12 @@ const checkIfTokenExist = (req, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
+
+  return token;
+};
+
+exports.protect = asyncHandler(async (req, res, next) => {
+  const token = getToken(req);
   if (!token) {
     return next(
       new ApiError(
@@ -54,12 +56,11 @@ const checkIfTokenExist = (req, next) => {
       )
     );
   }
-  return token;
-};
 
-const checkIfUserExists = async (userId, next) => {
-  const user = await User.findById(userId);
-  if (!user) {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+  const currentUser = await User.findById(decoded.userId);
+  if (!currentUser) {
     return next(
       new ApiError(
         "The user that belong to this token does no longer exist",
@@ -67,13 +68,10 @@ const checkIfUserExists = async (userId, next) => {
       )
     );
   }
-  return user;
-};
 
-const checkIfUserChangeHisPassword = (user, decoded, next) => {
-  if (user.passwordChangedAt) {
+  if (currentUser.passwordChangedAt) {
     const passChangedTimestamp = parseInt(
-      user.passwordChangedAt.getTime() / 1000,
+      currentUser.passwordChangedAt.getTime() / 1000,
       10
     );
 
@@ -86,16 +84,6 @@ const checkIfUserChangeHisPassword = (user, decoded, next) => {
       );
     }
   }
-};
-
-exports.protect = asyncHandler(async (req, res, next) => {
-  const token = checkIfTokenExist(req, next);
-
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-  const currentUser = await checkIfUserExists(decoded.userId, next);
-
-  checkIfUserChangeHisPassword(currentUser, decoded, next);
 
   req.user = currentUser;
 
