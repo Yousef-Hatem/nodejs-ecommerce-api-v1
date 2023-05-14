@@ -16,9 +16,13 @@ const {
   uploadProductImages,
 } = require("../services/productService");
 
+const reviewRoute = require("./reviewRoute");
+
 const authService = require("../services/authService");
 
 const router = express.Router();
+
+router.use("/:productId/reviews", reviewRoute);
 
 router
   .route("/")
