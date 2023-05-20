@@ -4,16 +4,16 @@ const authService = require("../services/authService");
 
 const {
   getLoggedUserAddresses,
-  addAddresses,
-  removeAddresses,
-} = require("../services/addressesService");
+  addAddress,
+  removeAddress,
+} = require("../services/addressService");
 
 const router = express.Router();
 
 router.use(authService.protect, authService.allowedTo("user"));
 
-router.route("/").get(getLoggedUserAddresses).post(addAddresses);
+router.route("/").get(getLoggedUserAddresses).post(addAddress);
 
-router.delete("/:addressesId", removeAddresses);
+router.delete("/:addressId", removeAddress);
 
 module.exports = router;

@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 
 const User = require("../models/userModel");
 
-exports.addAddresses = asyncHandler(async (req, res) => {
+exports.addAddress = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -13,23 +13,23 @@ exports.addAddresses = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    message: "Addresses added successfully.",
+    message: "Address added successfully.",
     data: user.addresses,
   });
 });
 
-exports.removeAddresses = asyncHandler(async (req, res) => {
+exports.removeAddress = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.user._id,
     {
-      $pull: { addresses: { _id: req.params.addressesId } },
+      $pull: { addresses: { _id: req.params.addressId } },
     },
     { new: true }
   );
 
   res.status(200).json({
     status: "success",
-    message: "Addresses removed successfully.",
+    message: "Address removed successfully.",
     data: user.addresses,
   });
 });
