@@ -51,3 +51,41 @@ exports.filterOrderForLoggedUser = asyncHandler(async (req, res, next) => {
 exports.findAllOrders = factory.getAll(Order);
 
 exports.findSpecificOrder = factory.getOne(Order);
+
+exports.updateOrderToPaid = asyncHandler(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(
+      new ApiError(
+        `There is no such a order with this id: ${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  order.isPaid = true;
+  order.paidAt = Date.now();
+
+  const updatedOrder = await order.save();
+
+  res.status(200).json({ status: "success", data: updatedOrder });
+});
+
+exports.updateOrderToDelivered = asyncHandler(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(
+      new ApiError(
+        `There is no such a order with this id: ${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  order.isDelivered = true;
+  order.deliveredAt = Date.now();
+
+  const updatedOrder = await order.save();
+
+  res.status(200).json({ status: "success", data: updatedOrder });
+});
