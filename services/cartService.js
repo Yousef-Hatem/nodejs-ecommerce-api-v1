@@ -48,3 +48,19 @@ exports.addProductToCart = asyncHandler(async (req, res) => {
     data: cart,
   });
 });
+
+exports.getLoggedUserCart = asyncHandler(async (req, res, next) => {
+  const cart = await Cart.findOne({ user: req.user._id });
+
+  if (!cart) {
+    return next(
+      new ApiError(`There is no cart for this user id: ${req.user._id}`, 404)
+    );
+  }
+
+  res.status(200).json({
+    status: "success",
+    numOfCartItems: cart.cartItems.length,
+    data: cart,
+  });
+});
