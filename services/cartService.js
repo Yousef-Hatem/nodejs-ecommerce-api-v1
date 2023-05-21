@@ -84,3 +84,8 @@ exports.removeSpecificCartItem = asyncHandler(async (req, res) => {
     data: cart,
   });
 });
+
+exports.clearCart = asyncHandler(async (req, res) => {
+  await Cart.findOneAndDelete({ user: req.user._id });
+  res.status(204).send();
+});
