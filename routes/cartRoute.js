@@ -6,6 +6,7 @@ const {
   removeSpecificCartItem,
   clearCart,
   updateCartItemQuantity,
+  applyCoupon,
 } = require("../services/cartService");
 
 const router = express.Router();
@@ -18,6 +19,8 @@ router
   .get(getLoggedUserCart)
   .post(addProductToCart)
   .delete(clearCart);
+
+router.put("/applyCoupon", applyCoupon);
 
 router
   .route("/:itemId")
