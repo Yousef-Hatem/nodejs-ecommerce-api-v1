@@ -20,7 +20,7 @@ exports.crateCashOrder = asyncHandler(async (req, res, next) => {
 
   const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
 
-  const order = Order.create({
+  const order = await Order.create({
     user: req.user._id,
     cartItems: cart.cartItems,
     shippingAddress: req.body.shippingAddress,
