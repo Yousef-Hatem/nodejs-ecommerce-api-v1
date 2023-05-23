@@ -4,10 +4,7 @@ const sharp = require("sharp");
 
 const factory = require("./handlersFactory");
 
-const {
-  uploadSingleImage,
-  // eslint-disable-next-line import/no-dynamic-require
-} = require(`${__dirname}/../middlewares/uploadImageMiddleware.js`);
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const Category = require("../models/categoryModel");
 
 exports.uploadCategoryImage = uploadSingleImage("image");
