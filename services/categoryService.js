@@ -3,7 +3,11 @@ const { v4: uuidv4 } = require("uuid");
 const sharp = require("sharp");
 
 const factory = require("./handlersFactory");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+
+const {
+  uploadSingleImage,
+  // eslint-disable-next-line import/no-dynamic-require
+} = require(`${__dirname}/../middlewares/uploadImageMiddleware`);
 const Category = require("../models/categoryModel");
 
 exports.uploadCategoryImage = uploadSingleImage("image");
