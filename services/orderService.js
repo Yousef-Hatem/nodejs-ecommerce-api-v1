@@ -8,7 +8,7 @@ const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
 
-exports.crateCashOrder = asyncHandler(async (req, res, next) => {
+exports.createCashOrder = asyncHandler(async (req, res, next) => {
   const taxPrice = 0;
   const shippingPrice = 0;
 
@@ -131,7 +131,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", session });
 });
 
-const crateCardOrder = async (session) => {
+const createCardOrder = async (session) => {
   const cartId = session.client_reference_id;
   const shippingAddress = session.metadata;
   const orderPrice = session.display_item[0].amount / 100;
@@ -178,7 +178,7 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
   }
 
   if (event.type === "checkout.session.completed") {
-    crateCardOrder(event.data.object);
+    createCardOrder(event.data.object);
   }
 
   res.status(200).json({ received: true });

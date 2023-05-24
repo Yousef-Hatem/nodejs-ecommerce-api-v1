@@ -1,7 +1,7 @@
 const express = require("express");
 
 const {
-  crateCashOrder,
+  createCashOrder,
   findAllOrders,
   findSpecificOrder,
   filterOrderForLoggedUser,
@@ -22,7 +22,7 @@ router.get(
   checkoutSession
 );
 
-router.post("/:cartId", authService.allowedTo("user"), crateCashOrder);
+router.post("/:cartId", authService.allowedTo("user"), createCashOrder);
 
 router.get("/", filterOrderForLoggedUser, findAllOrders);
 router.get("/:id", findSpecificOrder);
