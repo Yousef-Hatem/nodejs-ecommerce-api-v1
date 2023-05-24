@@ -36,7 +36,7 @@ app.post(
 );
 
 // Middlewares
-app.use(express.json());
+app.use(express.json({ limit: "20kb" }));
 app.use(express.static(path.join(__dirname, "uploads")));
 
 if (process.env.NODE_ENV === "development") {
