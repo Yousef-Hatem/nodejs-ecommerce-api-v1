@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const factory = require("./handlersFactory");
 const ApiError = require("../utils/apiError");
 
+const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
@@ -130,6 +131,37 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", session });
 });
 
+const crateCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const orderPrice = session.display_item[0].amount / 100;
+
+  const cart = await Cart.findById(cartId);
+  const user = await User.findOne({ email: session.customer_email });
+
+  const order = await Order.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: orderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: "card",
+  });
+
+  if (order) {
+    const bulkOption = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+      },
+    }));
+    await Product.bulkWrite(bulkOption, {});
+
+    await Cart.findByIdAndDelete(cartId);
+  }
+};
+
 exports.webhookCheckout = asyncHandler(async (req, res) => {
   const sig = req.headers["stripe-signature"];
 
@@ -146,7 +178,8 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
   }
 
   if (event.type === "checkout.session.completed") {
-    console.log("Create Order Here.....");
-    console.log(event.data.object.client_reference_id);
+    crateCardOrder(event.data.object);
   }
+
+  res.status(200).json({ received: true });
 });
