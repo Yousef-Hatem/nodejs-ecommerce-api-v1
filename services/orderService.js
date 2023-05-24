@@ -131,8 +131,6 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 });
 
 exports.webhookCheckout = asyncHandler(async (req, res) => {
-  console.log("Starting webhook");
-
   const sig = req.headers["stripe-signature"];
 
   let event;
@@ -147,9 +145,8 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  console.log("Event Type");
-
   if (event.type === "checkout.session.completed") {
     console.log("Create Order Here.....");
+    console.log(event.data.object.client_reference_id);
   }
 });
